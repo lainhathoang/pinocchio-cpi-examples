@@ -1,0 +1,26 @@
+use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
+use pinocchio_log::log;
+
+use crate::instruction::{ProgramInstruction, PumpFunBuyExactSolInContext};
+
+pub fn process_instruction(
+    _program_id: &Address,
+    accounts: &[AccountView],
+    instruction_data: &[u8],
+) -> ProgramResult {
+    if _program_id.as_array().ne(&crate::ID) {
+        return Err(ProgramError::IncorrectProgramId);
+    }
+
+    let (discriminator, data) = instruction_data
+        .split_first()
+        .ok_or(ProgramError::InvalidInstructionData)?;
+
+    match ProgramInstruction::try_from(discriminator)? {
+        ProgramInstruction::PumpFunBuyExactSolIn => {
+            log!("Instruction: Create");
+            PumpFunBuyExactSolInContext::try_from((accounts, data))?.handler()
+        }
+        _ => todo!(),
+    }
+}

@@ -10,12 +10,13 @@ pub use pump_fun::*;
 
 #[repr(u8)]
 pub enum ProgramInstruction {
-    // pump fun: 1x
+    // pump: 1x
     PumpFunBuy,
     PumpFunBuyExactSolIn,
     PumpFunSell,
     // raydium: 2x
     // meteora: 3x
+    // orca: 4x
 }
 
 impl TryFrom<&u8> for ProgramInstruction {

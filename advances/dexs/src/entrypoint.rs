@@ -1,7 +1,7 @@
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 use pinocchio_log::log;
 
-use crate::instruction::{ProgramInstruction, PumpFunBuyExactSolInContext};
+use crate::instruction::{ProgramInstruction, PumpFunBuyExactSolInContext, PumpFunSellContext};
 
 pub fn process_instruction(
     _program_id: &Address,
@@ -18,8 +18,12 @@ pub fn process_instruction(
 
     match ProgramInstruction::try_from(discriminator)? {
         ProgramInstruction::PumpFunBuyExactSolIn => {
-            log!("Instruction: Create");
+            log!("Instruction: PumpFunBuyExactSolIn");
             PumpFunBuyExactSolInContext::try_from((accounts, data))?.handler()
+        }
+        ProgramInstruction::PumpFunSell => {
+            log!("Instruction: PumpFunSell");
+            PumpFunSellContext::try_from((accounts, data))?.handler()
         }
         _ => todo!(),
     }

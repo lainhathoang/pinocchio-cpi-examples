@@ -2,10 +2,10 @@
 
 > **High-performance Cross-Program Invocations for Solana using the Pinocchio Framework**
 
-[![Solana](https://img.shields.io/badge/Solana-1.18+-blueviolet?logo=solana)](https://solana.com)
-[![Rust](https://img.shields.io/badge/Rust-1.79+-orange?logo=rust)](https://www.rust-lang.org)
+[![Solana](https://img.shields.io/badge/Solana-3.1+-blueviolet?logo=solana)](https://solana.com)
+[![Rust](https://img.shields.io/badge/Rust-1.90+-orange?logo=rust)](https://www.rust-lang.org)
 [![Pinocchio](https://img.shields.io/badge/Pinocchio-0.10+-green)](https://github.com/anza-xyz/pinocchio)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+<!-- [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) -->
 
 A comprehensive collection of **zero-dependency Solana programs** demonstrating how to perform Cross-Program Invocations (CPIs) to popular Solana protocols using the lightweight [Pinocchio](https://github.com/anza-xyz/pinocchio) framework.
 

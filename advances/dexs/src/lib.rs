@@ -13,7 +13,7 @@ use crate::entrypoint::process_instruction;
 use pinocchio::program_entrypoint;
 use pinocchio::{default_panic_handler, no_allocator};
 
-pinocchio_pubkey::declare_id!("4Jseg6sWcn8Lb9ycWHEuZo48B5n8ZwUdL6MfHbPhPdnW");
+pinocchio_pubkey::declare_id!("soGjzMzHhQ4pCR8bydyU7DHMJ4AxddLxsGbhUotGMP7");
 
 #[cfg(not(feature = "std"))]
 no_allocator!();

@@ -15,6 +15,8 @@ pub enum ProgramInstruction {
     PumpFunBuyExactSolIn,
     PumpFunSell,
     // raydium: 2x
+    RaydiumCpmmInit,
+    RaydiumCpmmSwapBaseIn,
     // meteora: 3x
     // orca: 4x
 }
@@ -24,10 +26,15 @@ impl TryFrom<&u8> for ProgramInstruction {
 
     fn try_from(value: &u8) -> Result<Self, Self::Error> {
         match *value {
-            // pump fun
-            11 => Ok(ProgramInstruction::PumpFunBuy),
+            // ===== pump fun
+            // 11 => Ok(ProgramInstruction::PumpFunBuy),
             12 => Ok(ProgramInstruction::PumpFunBuyExactSolIn),
             13 => Ok(ProgramInstruction::PumpFunSell),
+            // ===== raydium
+            // cpmm
+            21 => Ok(ProgramInstruction::RaydiumCpmmInit),
+            22 => Ok(ProgramInstruction::RaydiumCpmmSwapBaseIn),
+            //
             _ => Err(ProgramError::InvalidInstructionData),
         }
     }

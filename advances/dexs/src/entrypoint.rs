@@ -25,6 +25,14 @@ pub fn process_instruction(
             log!("Instruction: PumpFunSell");
             PumpFunSellContext::try_from((accounts, data))?.handler()
         }
+        ProgramInstruction::RaydiumCpmmInit => {
+            log!("Instruction: RaydiumCpmmInit");
+            Ok(())
+        }
+        ProgramInstruction::RaydiumCpmmSwapBaseIn => {
+            log!("Instruction: RaydiumCpmmSwapBaseIn");
+            Ok(())
+        }
         _ => todo!(),
     }
 }

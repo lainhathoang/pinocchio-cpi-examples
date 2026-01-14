@@ -17,6 +17,10 @@ pub fn process_instruction(
         .ok_or(ProgramError::InvalidInstructionData)?;
 
     match ProgramInstruction::try_from(discriminator)? {
+        ProgramInstruction::PumpFunBuy => {
+            log!("Instruction: PumpFunBuy");
+            Ok(())
+        }
         ProgramInstruction::PumpFunBuyExactSolIn => {
             log!("Instruction: PumpFunBuyExactSolIn");
             PumpFunBuyExactSolInContext::try_from((accounts, data))?.handler()

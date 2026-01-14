@@ -87,7 +87,7 @@ pub struct PumpFunBuyExactSolInData {
     #[idl_type(u64)]
     pub min_tokens_out: [u8; 8],
 
-    #[idl_type(Option<bool>)]
+    #[idl_type("Option<bool>")]
     pub track_volume: u8,
 }
 

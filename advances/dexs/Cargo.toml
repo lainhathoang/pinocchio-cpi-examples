@@ -21,10 +21,10 @@ shank = { workspace = true }
 pinocchio-helper = { path = "../../pinocchio-helper" }
 
 [dev-dependencies]
+tokio = { workspace = true }
 mollusk-svm = { workspace = true }
 solana-sdk = { workspace = true }
 solana-program-runtime = { workspace = true }
-solana-client = "3.1.6"
-tokio = { version = "1.44", features = ["full"] }
-spl-token = "9.0.0"
-spl-associated-token-account = "8.0.0"
+solana-client = { workspace = true }
+spl-token = { workspace = true }
+spl-associated-token-account = { workspace = true }

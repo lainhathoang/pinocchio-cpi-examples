@@ -1,0 +1,300 @@
+{
+	"version": "0.1.0",
+	"name": "dexs",
+	"instructions": [
+		{
+			"name": "PumpFunBuy",
+			"accounts": [],
+			"args": [],
+			"discriminant": {
+				"type": "u8",
+				"value": 0
+			}
+		},
+		{
+			"name": "PumpFunBuyExactSolIn",
+			"accounts": [
+				{
+					"name": "global",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Global state PDA"]
+				},
+				{
+					"name": "feeRecipient",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Fee recipient account"]
+				},
+				{
+					"name": "mint",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Token mint"]
+				},
+				{
+					"name": "bondingCurve",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Bonding curve PDA"]
+				},
+				{
+					"name": "associatedBondingCurve",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Associated token account for bonding curve"]
+				},
+				{
+					"name": "associatedUser",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["User's associated token account"]
+				},
+				{
+					"name": "user",
+					"isMut": true,
+					"isSigner": true,
+					"docs": ["User account (signer)"]
+				},
+				{
+					"name": "systemProgram",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["System program"]
+				},
+				{
+					"name": "tokenProgram",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Token program"]
+				},
+				{
+					"name": "creatorVault",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Creator vault PDA"]
+				},
+				{
+					"name": "eventAuthority",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Event authority PDA"]
+				},
+				{
+					"name": "program",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Pump fun program"]
+				},
+				{
+					"name": "globalVolumeAccumulator",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Global volume accumulator PDA"]
+				},
+				{
+					"name": "userVolumeAccumulator",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["User volume accumulator PDA"]
+				},
+				{
+					"name": "feeConfig",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Fee config PDA"]
+				},
+				{
+					"name": "feeProgram",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Fee program"]
+				}
+			],
+			"args": [
+				{
+					"name": "pumpFunBuyExactSolInData",
+					"type": {
+						"defined": "PumpFunBuyExactSolInData"
+					}
+				}
+			],
+			"discriminant": {
+				"type": "u8",
+				"value": 1
+			}
+		},
+		{
+			"name": "PumpFunSell",
+			"accounts": [
+				{
+					"name": "global",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Global state PDA"]
+				},
+				{
+					"name": "feeRecipient",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Fee recipient account"]
+				},
+				{
+					"name": "mint",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Token mint"]
+				},
+				{
+					"name": "bondingCurve",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Bonding curve PDA"]
+				},
+				{
+					"name": "associatedBondingCurve",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Associated token account for bonding curve"]
+				},
+				{
+					"name": "associatedUser",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["User's associated token account"]
+				},
+				{
+					"name": "user",
+					"isMut": true,
+					"isSigner": true,
+					"docs": ["User account (signer)"]
+				},
+				{
+					"name": "systemProgram",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["System program"]
+				},
+				{
+					"name": "creatorVault",
+					"isMut": true,
+					"isSigner": false,
+					"docs": ["Creator vault PDA"]
+				},
+				{
+					"name": "tokenProgram",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Token program"]
+				},
+				{
+					"name": "eventAuthority",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Event authority PDA"]
+				},
+				{
+					"name": "program",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Pump fun program"]
+				},
+				{
+					"name": "feeConfig",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Fee config PDA"]
+				},
+				{
+					"name": "feeProgram",
+					"isMut": false,
+					"isSigner": false,
+					"docs": ["Fee program"]
+				}
+			],
+			"args": [
+				{
+					"name": "pumpFunSellData",
+					"type": {
+						"defined": "PumpFunSellData"
+					}
+				}
+			],
+			"discriminant": {
+				"type": "u8",
+				"value": 2
+			}
+		},
+		{
+			"name": "RaydiumCpmmInit",
+			"accounts": [],
+			"args": [],
+			"discriminant": {
+				"type": "u8",
+				"value": 3
+			}
+		},
+		{
+			"name": "RaydiumCpmmSwapBaseIn",
+			"accounts": [],
+			"args": [],
+			"discriminant": {
+				"type": "u8",
+				"value": 4
+			}
+		}
+	],
+	"types": [
+		{
+			"name": "PumpFunBuyExactSolInData",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "bump",
+						"type": "u8"
+					},
+					{
+						"name": "spendableSolIn",
+						"type": "u64",
+						"attrs": ["idl-type"]
+					},
+					{
+						"name": "minTokensOut",
+						"type": "u64",
+						"attrs": ["idl-type"]
+					},
+					{
+						"name": "trackVolume",
+						"type": {
+							"option": "bool"
+						},
+						"attrs": ["idl-type"]
+					}
+				]
+			}
+		},
+		{
+			"name": "PumpFunSellData",
+			"type": {
+				"kind": "struct",
+				"fields": [
+					{
+						"name": "amount",
+						"type": "u64",
+						"attrs": ["idl-type"]
+					},
+					{
+						"name": "minSolOutput",
+						"type": "u64",
+						"attrs": ["idl-type"]
+					}
+				]
+			}
+		}
+	],
+	"metadata": {
+		"origin": "shank",
+		"address": "soGjzMzHhQ4pCR8bydyU7DHMJ4AxddLxsGbhUotGMP7"
+	}
+}

@@ -15,6 +15,13 @@ pinocchio-associated-token-account = "0.3.0"
 bytemuck = { version = "1.23.0", features = ["derive", "min_const_generics"] }
 shank = { version = "0.4.6" }
 
-mollusk-svm = "0.10.0"
+# clients
+tokio = { version = "1.44", features = ["full"] }
+solana-client = "3.1.6"
 solana-sdk = "3.0.0"
 solana-program-runtime = "3.0.8"
+spl-token = "9.0.0"
+spl-associated-token-account = "8.0.0"
+
+# test
+mollusk-svm = "0.10.0"

@@ -1,0 +1,20 @@
+{
+	"idl": "./idl/dexs.json",
+	"before": [],
+	"scripts": {
+		"js": {
+			"from": "@codama/renderers-js",
+			"args": ["clients/dexs/js/src/generated"]
+		},
+		"rust": {
+			"from": "@codama/renderers-rust",
+			"args": [
+				"clients/dexs/rust/src/generated",
+				{
+					"crateFolder": "clients/rust",
+					"formatCode": true
+				}
+			]
+		}
+	}
+}

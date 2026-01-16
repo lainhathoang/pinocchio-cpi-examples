@@ -7,13 +7,8 @@ use pinocchio::{
 };
 use shank::ShankType;
 
-// Raydium CPMM Program ID: CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C
-// Token: 92dmHZPDm4a9vXtvQVJtEYoDDZpsHYci8NWCrBk5AKgX
-
-// swap_base_output discriminator from IDL: [55, 217, 98, 86, 163, 74, 180, 173]
 const DISCRIMINATOR: [u8; 8] = [55, 217, 98, 86, 163, 74, 180, 173];
 
-// accounts
 pub struct RaydiumCpmmSwapBaseOutputAccounts<'info> {
     /// The user performing the swap
     pub payer: &'info AccountView,
@@ -41,24 +36,24 @@ pub struct RaydiumCpmmSwapBaseOutputAccounts<'info> {
     pub output_token_mint: &'info AccountView,
     /// The program account for the most recent oracle observation
     pub observation_state: &'info AccountView,
+    /// Raydium CPMM program
+    pub raydium_program: &'info AccountView,
 }
 
 impl<'info> TryFrom<&'info [AccountView]> for RaydiumCpmmSwapBaseOutputAccounts<'info> {
     type Error = ProgramError;
 
     fn try_from(accounts: &'info [AccountView]) -> Result<Self, Self::Error> {
-        let [payer, authority, amm_config, pool_state, input_token_account, output_token_account, input_vault, output_vault, input_token_program, output_token_program, input_token_mint, output_token_mint, observation_state, _raydium_program] =
+        let [payer, authority, amm_config, pool_state, input_token_account, output_token_account, input_vault, output_vault, input_token_program, output_token_program, input_token_mint, output_token_mint, observation_state, raydium_program] =
             accounts
         else {
             return Err(ProgramError::NotEnoughAccountKeys);
         };
 
-        // payer must be signer
         if !payer.is_signer() {
-            return Err(ProgramError::Immutable);
+            return Err(ProgramError::MissingRequiredSignature);
         }
 
-        // writable accounts check
         if !pool_state.is_writable()
             || !input_token_account.is_writable()
             || !output_token_account.is_writable()
@@ -83,11 +78,11 @@ impl<'info> TryFrom<&'info [AccountView]> for RaydiumCpmmSwapBaseOutputAccounts<
             input_token_mint,
             output_token_mint,
             observation_state,
+            raydium_program,
         })
     }
 }
 
-// data
 #[repr(C)]
 #[derive(Clone, Copy, Pod, Zeroable, ShankType)]
 pub struct RaydiumCpmmSwapBaseOutputData {
@@ -115,11 +110,9 @@ impl<'info> TryFrom<&'info [u8]> for RaydiumCpmmSwapBaseOutputData {
     }
 }
 
-// context
 pub struct RaydiumCpmmSwapBaseOutputContext<'info> {
     pub accounts: RaydiumCpmmSwapBaseOutputAccounts<'info>,
     pub instruction_data: RaydiumCpmmSwapBaseOutputData,
-    pub raydium_program: &'info AccountView,
 }
 
 impl<'info> TryFrom<(&'info [AccountView], &'info [u8])>
@@ -130,16 +123,12 @@ impl<'info> TryFrom<(&'info [AccountView], &'info [u8])>
     fn try_from(
         (accounts, data): (&'info [AccountView], &'info [u8]),
     ) -> Result<Self, Self::Error> {
-        // Get Raydium program from accounts (last account)
-        let raydium_program = accounts.last().ok_or(ProgramError::NotEnoughAccountKeys)?;
-
         let parsed_accounts = RaydiumCpmmSwapBaseOutputAccounts::try_from(accounts)?;
         let instruction_data = RaydiumCpmmSwapBaseOutputData::try_from(data)?;
 
         Ok(Self {
             accounts: parsed_accounts,
             instruction_data,
-            raydium_program,
         })
     }
 }
@@ -160,6 +149,7 @@ impl<'info> RaydiumCpmmSwapBaseOutputContext<'info> {
             input_token_mint,
             output_token_mint,
             observation_state,
+            raydium_program,
         } = self.accounts;
 
         let account_metas = [
@@ -178,17 +168,13 @@ impl<'info> RaydiumCpmmSwapBaseOutputContext<'info> {
             InstructionAccount::writable(observation_state.address()),
         ];
 
-        // instruction data
-        // [0] discriminator: 8 bytes
-        // [1] max_amount_in: 8 bytes
-        // [2] amount_out: 8 bytes
-        let mut instruction_data = [0u8; 24]; // 8 + 8 + 8 = 24 bytes
+        let mut instruction_data = [0u8; 24];
         instruction_data[0..8].copy_from_slice(&DISCRIMINATOR);
         instruction_data[8..16].copy_from_slice(&self.instruction_data.max_amount_in);
         instruction_data[16..24].copy_from_slice(&self.instruction_data.amount_out);
 
         let instruction = InstructionView {
-            program_id: self.raydium_program.address(),
+            program_id: raydium_program.address(),
             data: &instruction_data,
             accounts: &account_metas,
         };

@@ -24,4 +24,4 @@ spl-token = "9.0.0"
 spl-associated-token-account = "8.0.0"
 
 # test
-mollusk-svm = "0.10.0"
+mollusk-svm = "0.10.1"

@@ -55,7 +55,7 @@ pinocchio-cpi-examples/
 │       │   │       ├── swap_base_input.rs
 │       │   │       └── swap_base_output.rs
 │       │   └── entrypoint.rs
-├── clients/                     # Generated clients (Simulated)
+├── clients/                     # Generated clients
 │   └── dexs/
 │       ├── js/                  # TypeScript client
 │       └── rust/                # Rust client

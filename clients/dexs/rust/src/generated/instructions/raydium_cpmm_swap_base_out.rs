@@ -8,11 +8,11 @@
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
-pub const RAYDIUM_CPMM_SWAP_BASE_IN_DISCRIMINATOR: u8 = 4;
+pub const RAYDIUM_CPMM_SWAP_BASE_OUT_DISCRIMINATOR: u8 = 5;
 
 /// Accounts.
 #[derive(Debug)]
-pub struct RaydiumCpmmSwapBaseIn {
+pub struct RaydiumCpmmSwapBaseOut {
     /// The user performing the swap
     pub payer: solana_pubkey::Pubkey,
     /// Pool vault and lp mint authority PDA
@@ -43,10 +43,10 @@ pub struct RaydiumCpmmSwapBaseIn {
     pub raydium_program: solana_pubkey::Pubkey,
 }
 
-impl RaydiumCpmmSwapBaseIn {
+impl RaydiumCpmmSwapBaseOut {
     pub fn instruction(
         &self,
-        args: RaydiumCpmmSwapBaseInInstructionArgs,
+        args: RaydiumCpmmSwapBaseOutInstructionArgs,
     ) -> solana_instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
@@ -54,7 +54,7 @@ impl RaydiumCpmmSwapBaseIn {
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: RaydiumCpmmSwapBaseInInstructionArgs,
+        args: RaydiumCpmmSwapBaseOutInstructionArgs,
         remaining_accounts: &[solana_instruction::AccountMeta],
     ) -> solana_instruction::Instruction {
         let mut accounts = Vec::with_capacity(14 + remaining_accounts.len());
@@ -111,7 +111,7 @@ impl RaydiumCpmmSwapBaseIn {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = RaydiumCpmmSwapBaseInInstructionData::new()
+        let mut data = RaydiumCpmmSwapBaseOutInstructionData::new()
             .try_to_vec()
             .unwrap();
         let mut args = args.try_to_vec().unwrap();
@@ -127,13 +127,13 @@ impl RaydiumCpmmSwapBaseIn {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RaydiumCpmmSwapBaseInInstructionData {
+pub struct RaydiumCpmmSwapBaseOutInstructionData {
     discriminator: u8,
 }
 
-impl RaydiumCpmmSwapBaseInInstructionData {
+impl RaydiumCpmmSwapBaseOutInstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 4 }
+        Self { discriminator: 5 }
     }
 
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
@@ -141,7 +141,7 @@ impl RaydiumCpmmSwapBaseInInstructionData {
     }
 }
 
-impl Default for RaydiumCpmmSwapBaseInInstructionData {
+impl Default for RaydiumCpmmSwapBaseOutInstructionData {
     fn default() -> Self {
         Self::new()
     }
@@ -149,18 +149,18 @@ impl Default for RaydiumCpmmSwapBaseInInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RaydiumCpmmSwapBaseInInstructionArgs {
-    pub amount_in: u64,
-    pub minimum_amount_out: u64,
+pub struct RaydiumCpmmSwapBaseOutInstructionArgs {
+    pub max_amount_in: u64,
+    pub amount_out: u64,
 }
 
-impl RaydiumCpmmSwapBaseInInstructionArgs {
+impl RaydiumCpmmSwapBaseOutInstructionArgs {
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
         borsh::to_vec(self)
     }
 }
 
-/// Instruction builder for `RaydiumCpmmSwapBaseIn`.
+/// Instruction builder for `RaydiumCpmmSwapBaseOut`.
 ///
 /// ### Accounts:
 ///
@@ -179,7 +179,7 @@ impl RaydiumCpmmSwapBaseInInstructionArgs {
 ///   12. `[writable]` observation_state
 ///   13. `[]` raydium_program
 #[derive(Clone, Debug, Default)]
-pub struct RaydiumCpmmSwapBaseInBuilder {
+pub struct RaydiumCpmmSwapBaseOutBuilder {
     payer: Option<solana_pubkey::Pubkey>,
     authority: Option<solana_pubkey::Pubkey>,
     amm_config: Option<solana_pubkey::Pubkey>,
@@ -194,12 +194,12 @@ pub struct RaydiumCpmmSwapBaseInBuilder {
     output_token_mint: Option<solana_pubkey::Pubkey>,
     observation_state: Option<solana_pubkey::Pubkey>,
     raydium_program: Option<solana_pubkey::Pubkey>,
-    amount_in: Option<u64>,
-    minimum_amount_out: Option<u64>,
+    max_amount_in: Option<u64>,
+    amount_out: Option<u64>,
     __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl RaydiumCpmmSwapBaseInBuilder {
+impl RaydiumCpmmSwapBaseOutBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -294,13 +294,13 @@ impl RaydiumCpmmSwapBaseInBuilder {
         self
     }
     #[inline(always)]
-    pub fn amount_in(&mut self, amount_in: u64) -> &mut Self {
-        self.amount_in = Some(amount_in);
+    pub fn max_amount_in(&mut self, max_amount_in: u64) -> &mut Self {
+        self.max_amount_in = Some(max_amount_in);
         self
     }
     #[inline(always)]
-    pub fn minimum_amount_out(&mut self, minimum_amount_out: u64) -> &mut Self {
-        self.minimum_amount_out = Some(minimum_amount_out);
+    pub fn amount_out(&mut self, amount_out: u64) -> &mut Self {
+        self.amount_out = Some(amount_out);
         self
     }
     /// Add an additional account to the instruction.
@@ -320,7 +320,7 @@ impl RaydiumCpmmSwapBaseInBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_instruction::Instruction {
-        let accounts = RaydiumCpmmSwapBaseIn {
+        let accounts = RaydiumCpmmSwapBaseOut {
             payer: self.payer.expect("payer is not set"),
             authority: self.authority.expect("authority is not set"),
             amm_config: self.amm_config.expect("amm_config is not set"),
@@ -348,20 +348,20 @@ impl RaydiumCpmmSwapBaseInBuilder {
                 .expect("observation_state is not set"),
             raydium_program: self.raydium_program.expect("raydium_program is not set"),
         };
-        let args = RaydiumCpmmSwapBaseInInstructionArgs {
-            amount_in: self.amount_in.clone().expect("amount_in is not set"),
-            minimum_amount_out: self
-                .minimum_amount_out
+        let args = RaydiumCpmmSwapBaseOutInstructionArgs {
+            max_amount_in: self
+                .max_amount_in
                 .clone()
-                .expect("minimum_amount_out is not set"),
+                .expect("max_amount_in is not set"),
+            amount_out: self.amount_out.clone().expect("amount_out is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `raydium_cpmm_swap_base_in` CPI accounts.
-pub struct RaydiumCpmmSwapBaseInCpiAccounts<'a, 'b> {
+/// `raydium_cpmm_swap_base_out` CPI accounts.
+pub struct RaydiumCpmmSwapBaseOutCpiAccounts<'a, 'b> {
     /// The user performing the swap
     pub payer: &'b solana_account_info::AccountInfo<'a>,
     /// Pool vault and lp mint authority PDA
@@ -392,8 +392,8 @@ pub struct RaydiumCpmmSwapBaseInCpiAccounts<'a, 'b> {
     pub raydium_program: &'b solana_account_info::AccountInfo<'a>,
 }
 
-/// `raydium_cpmm_swap_base_in` CPI instruction.
-pub struct RaydiumCpmmSwapBaseInCpi<'a, 'b> {
+/// `raydium_cpmm_swap_base_out` CPI instruction.
+pub struct RaydiumCpmmSwapBaseOutCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_account_info::AccountInfo<'a>,
     /// The user performing the swap
@@ -425,14 +425,14 @@ pub struct RaydiumCpmmSwapBaseInCpi<'a, 'b> {
     /// Raydium CPMM program
     pub raydium_program: &'b solana_account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: RaydiumCpmmSwapBaseInInstructionArgs,
+    pub __args: RaydiumCpmmSwapBaseOutInstructionArgs,
 }
 
-impl<'a, 'b> RaydiumCpmmSwapBaseInCpi<'a, 'b> {
+impl<'a, 'b> RaydiumCpmmSwapBaseOutCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_account_info::AccountInfo<'a>,
-        accounts: RaydiumCpmmSwapBaseInCpiAccounts<'a, 'b>,
-        args: RaydiumCpmmSwapBaseInInstructionArgs,
+        accounts: RaydiumCpmmSwapBaseOutCpiAccounts<'a, 'b>,
+        args: RaydiumCpmmSwapBaseOutInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
@@ -540,7 +540,7 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = RaydiumCpmmSwapBaseInInstructionData::new()
+        let mut data = RaydiumCpmmSwapBaseOutInstructionData::new()
             .try_to_vec()
             .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
@@ -579,7 +579,7 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `RaydiumCpmmSwapBaseIn` via CPI.
+/// Instruction builder for `RaydiumCpmmSwapBaseOut` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -598,13 +598,13 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpi<'a, 'b> {
 ///   12. `[writable]` observation_state
 ///   13. `[]` raydium_program
 #[derive(Clone, Debug)]
-pub struct RaydiumCpmmSwapBaseInCpiBuilder<'a, 'b> {
-    instruction: Box<RaydiumCpmmSwapBaseInCpiBuilderInstruction<'a, 'b>>,
+pub struct RaydiumCpmmSwapBaseOutCpiBuilder<'a, 'b> {
+    instruction: Box<RaydiumCpmmSwapBaseOutCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> RaydiumCpmmSwapBaseInCpiBuilder<'a, 'b> {
+impl<'a, 'b> RaydiumCpmmSwapBaseOutCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(RaydiumCpmmSwapBaseInCpiBuilderInstruction {
+        let instruction = Box::new(RaydiumCpmmSwapBaseOutCpiBuilderInstruction {
             __program: program,
             payer: None,
             authority: None,
@@ -620,8 +620,8 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpiBuilder<'a, 'b> {
             output_token_mint: None,
             observation_state: None,
             raydium_program: None,
-            amount_in: None,
-            minimum_amount_out: None,
+            max_amount_in: None,
+            amount_out: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -747,13 +747,13 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn amount_in(&mut self, amount_in: u64) -> &mut Self {
-        self.instruction.amount_in = Some(amount_in);
+    pub fn max_amount_in(&mut self, max_amount_in: u64) -> &mut Self {
+        self.instruction.max_amount_in = Some(max_amount_in);
         self
     }
     #[inline(always)]
-    pub fn minimum_amount_out(&mut self, minimum_amount_out: u64) -> &mut Self {
-        self.instruction.minimum_amount_out = Some(minimum_amount_out);
+    pub fn amount_out(&mut self, amount_out: u64) -> &mut Self {
+        self.instruction.amount_out = Some(amount_out);
         self
     }
     /// Add an additional account to the instruction.
@@ -790,19 +790,19 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpiBuilder<'a, 'b> {
     #[allow(clippy::clone_on_copy)]
     #[allow(clippy::vec_init_then_push)]
     pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-        let args = RaydiumCpmmSwapBaseInInstructionArgs {
-            amount_in: self
+        let args = RaydiumCpmmSwapBaseOutInstructionArgs {
+            max_amount_in: self
                 .instruction
-                .amount_in
+                .max_amount_in
                 .clone()
-                .expect("amount_in is not set"),
-            minimum_amount_out: self
+                .expect("max_amount_in is not set"),
+            amount_out: self
                 .instruction
-                .minimum_amount_out
+                .amount_out
                 .clone()
-                .expect("minimum_amount_out is not set"),
+                .expect("amount_out is not set"),
         };
-        let instruction = RaydiumCpmmSwapBaseInCpi {
+        let instruction = RaydiumCpmmSwapBaseOutCpi {
             __program: self.instruction.__program,
 
             payer: self.instruction.payer.expect("payer is not set"),
@@ -872,7 +872,7 @@ impl<'a, 'b> RaydiumCpmmSwapBaseInCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct RaydiumCpmmSwapBaseInCpiBuilderInstruction<'a, 'b> {
+struct RaydiumCpmmSwapBaseOutCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_account_info::AccountInfo<'a>,
     payer: Option<&'b solana_account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_account_info::AccountInfo<'a>>,
@@ -888,8 +888,8 @@ struct RaydiumCpmmSwapBaseInCpiBuilderInstruction<'a, 'b> {
     output_token_mint: Option<&'b solana_account_info::AccountInfo<'a>>,
     observation_state: Option<&'b solana_account_info::AccountInfo<'a>>,
     raydium_program: Option<&'b solana_account_info::AccountInfo<'a>>,
-    amount_in: Option<u64>,
-    minimum_amount_out: Option<u64>,
+    max_amount_in: Option<u64>,
+    amount_out: Option<u64>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

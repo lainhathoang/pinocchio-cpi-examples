@@ -1,8 +1,11 @@
 use pinocchio::error::ProgramError;
 
 pub mod pump_fun;
+pub mod raydium_cpmm;
 
 pub use pump_fun::*;
+pub use raydium_cpmm::*;
+
 use shank::ShankType;
 
 // ix accounts
@@ -18,6 +21,7 @@ pub enum ProgramInstruction {
     // raydium
     RaydiumCpmmInit,
     RaydiumCpmmSwapBaseIn,
+    RaydiumCpmmSwapBaseOut,
     // meteora
     // orca
 }
@@ -35,6 +39,7 @@ impl TryFrom<&u8> for ProgramInstruction {
             // cpmm
             3 => Ok(ProgramInstruction::RaydiumCpmmInit),
             4 => Ok(ProgramInstruction::RaydiumCpmmSwapBaseIn),
+            5 => Ok(ProgramInstruction::RaydiumCpmmSwapBaseOut),
             //
             _ => Err(ProgramError::InvalidInstructionData),
         }
@@ -42,7 +47,10 @@ impl TryFrom<&u8> for ProgramInstruction {
 }
 
 mod idl_gen {
-    use super::{PumpFunBuyExactSolInData, PumpFunSellData};
+    use super::{
+        PumpFunBuyExactSolInData, PumpFunSellData, RaydiumCpmmSwapBaseInputData,
+        RaydiumCpmmSwapBaseOutputData,
+    };
 
     /// IDL generation enum - MUST match ProgramInstruction order exactly!
     /// Shank assigns discriminators based on variant order (0, 1, 2, ...)
@@ -122,7 +130,121 @@ mod idl_gen {
         RaydiumCpmmInit,
 
         // ===== Raydium CPMM Swap Base In (discriminator = 4) =====
-        // Placeholder - not implemented yet
-        RaydiumCpmmSwapBaseIn,
+        #[account(0, signer, name = "payer", desc = "The user performing the swap")]
+        #[account(1, name = "authority", desc = "Pool vault and lp mint authority PDA")]
+        #[account(
+            2,
+            name = "amm_config",
+            desc = "The factory state to read protocol fees"
+        )]
+        #[account(
+            3,
+            writable,
+            name = "pool_state",
+            desc = "The program account of the pool in which the swap will be performed"
+        )]
+        #[account(
+            4,
+            writable,
+            name = "input_token_account",
+            desc = "The user token account for input token"
+        )]
+        #[account(
+            5,
+            writable,
+            name = "output_token_account",
+            desc = "The user token account for output token"
+        )]
+        #[account(
+            6,
+            writable,
+            name = "input_vault",
+            desc = "The vault token account for input token"
+        )]
+        #[account(
+            7,
+            writable,
+            name = "output_vault",
+            desc = "The vault token account for output token"
+        )]
+        #[account(
+            8,
+            name = "input_token_program",
+            desc = "SPL program for input token transfers"
+        )]
+        #[account(
+            9,
+            name = "output_token_program",
+            desc = "SPL program for output token transfers"
+        )]
+        #[account(10, name = "input_token_mint", desc = "The mint of input token")]
+        #[account(11, name = "output_token_mint", desc = "The mint of output token")]
+        #[account(
+            12,
+            writable,
+            name = "observation_state",
+            desc = "The program account for the most recent oracle observation"
+        )]
+        #[account(13, name = "raydium_program", desc = "Raydium CPMM program")]
+        RaydiumCpmmSwapBaseIn(RaydiumCpmmSwapBaseInputData),
+
+        // ===== Raydium CPMM Swap Base Out (discriminator = 5) =====
+        #[account(0, signer, name = "payer", desc = "The user performing the swap")]
+        #[account(1, name = "authority", desc = "Pool vault and lp mint authority PDA")]
+        #[account(
+            2,
+            name = "amm_config",
+            desc = "The factory state to read protocol fees"
+        )]
+        #[account(
+            3,
+            writable,
+            name = "pool_state",
+            desc = "The program account of the pool in which the swap will be performed"
+        )]
+        #[account(
+            4,
+            writable,
+            name = "input_token_account",
+            desc = "The user token account for input token"
+        )]
+        #[account(
+            5,
+            writable,
+            name = "output_token_account",
+            desc = "The user token account for output token"
+        )]
+        #[account(
+            6,
+            writable,
+            name = "input_vault",
+            desc = "The vault token account for input token"
+        )]
+        #[account(
+            7,
+            writable,
+            name = "output_vault",
+            desc = "The vault token account for output token"
+        )]
+        #[account(
+            8,
+            name = "input_token_program",
+            desc = "SPL program for input token transfers"
+        )]
+        #[account(
+            9,
+            name = "output_token_program",
+            desc = "SPL program for output token transfers"
+        )]
+        #[account(10, name = "input_token_mint", desc = "The mint of input token")]
+        #[account(11, name = "output_token_mint", desc = "The mint of output token")]
+        #[account(
+            12,
+            writable,
+            name = "observation_state",
+            desc = "The program account for the most recent oracle observation"
+        )]
+        #[account(13, name = "raydium_program", desc = "Raydium CPMM program")]
+        RaydiumCpmmSwapBaseOut(RaydiumCpmmSwapBaseOutputData),
     }
 }

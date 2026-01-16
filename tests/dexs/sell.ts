@@ -12,11 +12,12 @@
  */
 
 import {
-	appendTransactionMessageInstruction,
+	appendTransactionMessageInstructions,
 	createSolanaRpc,
 	createSolanaRpcSubscriptions,
 	createTransactionMessage,
 	getSignatureFromTransaction,
+	type Instruction,
 	isSolanaError,
 	pipe,
 	sendAndConfirmTransactionFactory,
@@ -55,28 +56,13 @@ async function testSell() {
 	const rpcSubscriptions = createSolanaRpcSubscriptions(WSS_URL)
 
 	// Load keypair
-	let signer: Awaited<ReturnType<typeof loadKeypair>>
-	try {
-		signer = await loadKeypair()
-	} catch (e) {
-		console.error("Failed to load keypair:", e)
-		console.log("Ensure ~/.config/solana/id.json exists")
-		return
-	}
-
+	const signer = await loadKeypair()
 	const userAddress = signer.address
 	console.log("User:", userAddress)
 
 	// Check SOL balance
-	let balance: bigint
-	try {
-		const balanceResult = await rpc.getBalance(userAddress).send()
-		balance = balanceResult.value
-	} catch (e) {
-		console.error("Failed to get balance:", e)
-		console.log("Make sure localnet is running: solana-test-validator")
-		return
-	}
+	const balanceResult = await rpc.getBalance(userAddress).send()
+	const balance = balanceResult.value
 
 	console.log(`User SOL balance: ${Number(balance) / Number(LAMPORTS_PER_SOL)} SOL`)
 
@@ -141,12 +127,13 @@ async function testSell() {
 		minSolOutput
 	})
 
-	// Patch the discriminator (generated uses 2, but we verify it's correct)
+	// Patch the discriminator
 	const patchedData = new Uint8Array(generatedInstruction.data)
 	patchedData[0] = PUMP_FUN_SELL_DISCRIMINATOR
 
-	const sellInstruction = {
-		...generatedInstruction,
+	const sellInstruction: Instruction = {
+		programAddress: generatedInstruction.programAddress,
+		accounts: generatedInstruction.accounts,
 		data: patchedData
 	}
 
@@ -160,7 +147,7 @@ async function testSell() {
 		createTransactionMessage({ version: 0 }),
 		tx => setTransactionMessageFeePayerSigner(signer, tx),
 		tx => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
-		tx => appendTransactionMessageInstruction(sellInstruction, tx)
+		tx => appendTransactionMessageInstructions([sellInstruction], tx)
 	)
 
 	// Sign transaction
@@ -175,10 +162,9 @@ async function testSell() {
 			rpcSubscriptions
 		})
 
-		// @ts-expect-error - Type compatibility issue with @solana/kit transaction types
-		await sendAndConfirmTransaction(signedTransaction, {
-			commitment: "confirmed"
-		})
+		await (
+			sendAndConfirmTransaction as (tx: unknown, opts: { commitment: string }) => Promise<void>
+		)(signedTransaction, { commitment: "confirmed" })
 
 		const signature = getSignatureFromTransaction(signedTransaction)
 		console.log("\n✅ Transaction successful!")

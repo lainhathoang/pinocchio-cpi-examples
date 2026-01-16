@@ -33,13 +33,13 @@ import {
 import { DEXS_PROGRAM_ADDRESS } from "../programs"
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared"
 
-export const RAYDIUM_CPMM_SWAP_BASE_IN_DISCRIMINATOR = 4
+export const RAYDIUM_CPMM_SWAP_BASE_OUT_DISCRIMINATOR = 5
 
-export function getRaydiumCpmmSwapBaseInDiscriminatorBytes() {
-	return getU8Encoder().encode(RAYDIUM_CPMM_SWAP_BASE_IN_DISCRIMINATOR)
+export function getRaydiumCpmmSwapBaseOutDiscriminatorBytes() {
+	return getU8Encoder().encode(RAYDIUM_CPMM_SWAP_BASE_OUT_DISCRIMINATOR)
 }
 
-export type RaydiumCpmmSwapBaseInInstruction<
+export type RaydiumCpmmSwapBaseOutInstruction<
 	TProgram extends string = typeof DEXS_PROGRAM_ADDRESS,
 	TAccountPayer extends string | AccountMeta<string> = string,
 	TAccountAuthority extends string | AccountMeta<string> = string,
@@ -98,50 +98,50 @@ export type RaydiumCpmmSwapBaseInInstruction<
 		]
 	>
 
-export type RaydiumCpmmSwapBaseInInstructionData = {
+export type RaydiumCpmmSwapBaseOutInstructionData = {
 	discriminator: number
-	amountIn: bigint
-	minimumAmountOut: bigint
+	maxAmountIn: bigint
+	amountOut: bigint
 }
 
-export type RaydiumCpmmSwapBaseInInstructionDataArgs = {
-	amountIn: number | bigint
-	minimumAmountOut: number | bigint
+export type RaydiumCpmmSwapBaseOutInstructionDataArgs = {
+	maxAmountIn: number | bigint
+	amountOut: number | bigint
 }
 
-export function getRaydiumCpmmSwapBaseInInstructionDataEncoder(): FixedSizeEncoder<RaydiumCpmmSwapBaseInInstructionDataArgs> {
+export function getRaydiumCpmmSwapBaseOutInstructionDataEncoder(): FixedSizeEncoder<RaydiumCpmmSwapBaseOutInstructionDataArgs> {
 	return transformEncoder(
 		getStructEncoder([
 			["discriminator", getU8Encoder()],
-			["amountIn", getU64Encoder()],
-			["minimumAmountOut", getU64Encoder()]
+			["maxAmountIn", getU64Encoder()],
+			["amountOut", getU64Encoder()]
 		]),
 		value => ({
 			...value,
-			discriminator: RAYDIUM_CPMM_SWAP_BASE_IN_DISCRIMINATOR
+			discriminator: RAYDIUM_CPMM_SWAP_BASE_OUT_DISCRIMINATOR
 		})
 	)
 }
 
-export function getRaydiumCpmmSwapBaseInInstructionDataDecoder(): FixedSizeDecoder<RaydiumCpmmSwapBaseInInstructionData> {
+export function getRaydiumCpmmSwapBaseOutInstructionDataDecoder(): FixedSizeDecoder<RaydiumCpmmSwapBaseOutInstructionData> {
 	return getStructDecoder([
 		["discriminator", getU8Decoder()],
-		["amountIn", getU64Decoder()],
-		["minimumAmountOut", getU64Decoder()]
+		["maxAmountIn", getU64Decoder()],
+		["amountOut", getU64Decoder()]
 	])
 }
 
-export function getRaydiumCpmmSwapBaseInInstructionDataCodec(): FixedSizeCodec<
-	RaydiumCpmmSwapBaseInInstructionDataArgs,
-	RaydiumCpmmSwapBaseInInstructionData
+export function getRaydiumCpmmSwapBaseOutInstructionDataCodec(): FixedSizeCodec<
+	RaydiumCpmmSwapBaseOutInstructionDataArgs,
+	RaydiumCpmmSwapBaseOutInstructionData
 > {
 	return combineCodec(
-		getRaydiumCpmmSwapBaseInInstructionDataEncoder(),
-		getRaydiumCpmmSwapBaseInInstructionDataDecoder()
+		getRaydiumCpmmSwapBaseOutInstructionDataEncoder(),
+		getRaydiumCpmmSwapBaseOutInstructionDataDecoder()
 	)
 }
 
-export type RaydiumCpmmSwapBaseInInput<
+export type RaydiumCpmmSwapBaseOutInput<
 	TAccountPayer extends string = string,
 	TAccountAuthority extends string = string,
 	TAccountAmmConfig extends string = string,
@@ -185,11 +185,11 @@ export type RaydiumCpmmSwapBaseInInput<
 	observationState: Address<TAccountObservationState>
 	/** Raydium CPMM program */
 	raydiumProgram: Address<TAccountRaydiumProgram>
-	amountIn: RaydiumCpmmSwapBaseInInstructionDataArgs["amountIn"]
-	minimumAmountOut: RaydiumCpmmSwapBaseInInstructionDataArgs["minimumAmountOut"]
+	maxAmountIn: RaydiumCpmmSwapBaseOutInstructionDataArgs["maxAmountIn"]
+	amountOut: RaydiumCpmmSwapBaseOutInstructionDataArgs["amountOut"]
 }
 
-export function getRaydiumCpmmSwapBaseInInstruction<
+export function getRaydiumCpmmSwapBaseOutInstruction<
 	TAccountPayer extends string,
 	TAccountAuthority extends string,
 	TAccountAmmConfig extends string,
@@ -206,7 +206,7 @@ export function getRaydiumCpmmSwapBaseInInstruction<
 	TAccountRaydiumProgram extends string,
 	TProgramAddress extends Address = typeof DEXS_PROGRAM_ADDRESS
 >(
-	input: RaydiumCpmmSwapBaseInInput<
+	input: RaydiumCpmmSwapBaseOutInput<
 		TAccountPayer,
 		TAccountAuthority,
 		TAccountAmmConfig,
@@ -223,7 +223,7 @@ export function getRaydiumCpmmSwapBaseInInstruction<
 		TAccountRaydiumProgram
 	>,
 	config?: { programAddress?: TProgramAddress }
-): RaydiumCpmmSwapBaseInInstruction<
+): RaydiumCpmmSwapBaseOutInstruction<
 	TProgramAddress,
 	TAccountPayer,
 	TAccountAuthority,
@@ -301,11 +301,11 @@ export function getRaydiumCpmmSwapBaseInInstruction<
 			getAccountMeta(accounts.observationState),
 			getAccountMeta(accounts.raydiumProgram)
 		],
-		data: getRaydiumCpmmSwapBaseInInstructionDataEncoder().encode(
-			args as RaydiumCpmmSwapBaseInInstructionDataArgs
+		data: getRaydiumCpmmSwapBaseOutInstructionDataEncoder().encode(
+			args as RaydiumCpmmSwapBaseOutInstructionDataArgs
 		),
 		programAddress
-	} as RaydiumCpmmSwapBaseInInstruction<
+	} as RaydiumCpmmSwapBaseOutInstruction<
 		TProgramAddress,
 		TAccountPayer,
 		TAccountAuthority,
@@ -324,7 +324,7 @@ export function getRaydiumCpmmSwapBaseInInstruction<
 	>)
 }
 
-export type ParsedRaydiumCpmmSwapBaseInInstruction<
+export type ParsedRaydiumCpmmSwapBaseOutInstruction<
 	TProgram extends string = typeof DEXS_PROGRAM_ADDRESS,
 	TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]
 > = {
@@ -359,17 +359,17 @@ export type ParsedRaydiumCpmmSwapBaseInInstruction<
 		/** Raydium CPMM program */
 		raydiumProgram: TAccountMetas[13]
 	}
-	data: RaydiumCpmmSwapBaseInInstructionData
+	data: RaydiumCpmmSwapBaseOutInstructionData
 }
 
-export function parseRaydiumCpmmSwapBaseInInstruction<
+export function parseRaydiumCpmmSwapBaseOutInstruction<
 	TProgram extends string,
 	TAccountMetas extends readonly AccountMeta[]
 >(
 	instruction: Instruction<TProgram> &
 		InstructionWithAccounts<TAccountMetas> &
 		InstructionWithData<ReadonlyUint8Array>
-): ParsedRaydiumCpmmSwapBaseInInstruction<TProgram, TAccountMetas> {
+): ParsedRaydiumCpmmSwapBaseOutInstruction<TProgram, TAccountMetas> {
 	if (instruction.accounts.length < 14) {
 		// TODO: Coded error.
 		throw new Error("Not enough accounts")
@@ -398,6 +398,6 @@ export function parseRaydiumCpmmSwapBaseInInstruction<
 			observationState: getNextAccount(),
 			raydiumProgram: getNextAccount()
 		},
-		data: getRaydiumCpmmSwapBaseInInstructionDataDecoder().decode(instruction.data)
+		data: getRaydiumCpmmSwapBaseOutInstructionDataDecoder().decode(instruction.data)
 	}
 }

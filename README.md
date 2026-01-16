@@ -2,10 +2,9 @@
 
 > **High-performance Cross-Program Invocations for Solana using the Pinocchio Framework**
 
-[![Solana](https://img.shields.io/badge/Solana-3.1+-blueviolet?logo=solana)](https://solana.com)
-[![Rust](https://img.shields.io/badge/Rust-1.90+-orange?logo=rust)](https://www.rust-lang.org)
-[![Pinocchio](https://img.shields.io/badge/Pinocchio-0.10+-green)](https://github.com/anza-xyz/pinocchio)
-<!-- [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) -->
+[![Solana](https://img.shields.io/badge/Solana-1.18+-blueviolet?logo=solana)](https://solana.com)
+[![Rust](https://img.shields.io/badge/Rust-1.75+-orange?logo=rust)](https://www.rust-lang.org)
+[![Pinocchio](https://img.shields.io/badge/Pinocchio-0.6+-green)](https://github.com/anza-xyz/pinocchio)
 
 A comprehensive collection of **zero-dependency Solana programs** demonstrating how to perform Cross-Program Invocations (CPIs) to popular Solana protocols using the lightweight [Pinocchio](https://github.com/anza-xyz/pinocchio) framework.
 
@@ -30,33 +29,14 @@ Pinocchio is a **no_std**, zero-dependency library that provides significant per
 
 Perform swaps and trades on popular decentralized exchanges:
 
-| Protocol         | Instruction        | Status         |
-| ---------------- | ------------------ | -------------- |
-| **Pump.fun**     | `buy_exact_sol_in` | ✅ Complete    |
-| **Pump.fun**     | `sell`             | ✅ Complete    |
-| **Raydium CPMM** | `swap_base_in`     | 🚧 In Progress |
-| **Meteora**      | Coming soon        | 📋 Planned     |
-| **Orca**         | Coming soon        | 📋 Planned     |
-
-### 🎨 Token & NFT Programs
-
-Interact with token standards:
-
-| Protocol       | Description               | Status     |
-| -------------- | ------------------------- | ---------- |
-| **SPL Token**  | Standard token operations | 📋 Planned |
-| **Token-2022** | Extended token features   | 📋 Planned |
-| **Metaplex**   | NFT minting & metadata    | 📋 Planned |
-
-### 🔮 Oracle Integrations
-
-Fetch price data from decentralized oracles:
-
-| Protocol | Description | Status     |
-| -------- | ----------- | ---------- |
-| **Pyth** | Price feeds | 📋 Planned |
-
-<!--|      | **Switchboard** | Oracle network | 📋 Planned | -->
+| Protocol         | Instruction        | Status      |
+| ---------------- | ------------------ | ----------- |
+| **Pump.fun**     | `buy_exact_sol_in` | ✅ Complete |
+| **Pump.fun**     | `sell`             | ✅ Complete |
+| **Raydium CPMM** | `swap_base_input`  | ✅ Complete |
+| **Raydium CPMM** | `swap_base_output` | ✅ Complete |
+| **Meteora**      | Coming soon        | 📋 Planned  |
+| **Orca**         | Coming soon        | 📋 Planned  |
 
 ---
 
@@ -65,18 +45,29 @@ Fetch price data from decentralized oracles:
 ```
 pinocchio-cpi-examples/
 ├── advances/
-│   ├── dexs/                    # DEX CPI implementations
-│   │   ├── src/
-│   │   │   └── instruction/
-│   │   │       └── pump_fun/    # Pump.fun CPIs
-│   │   │           ├── buy_exact_sol_in.rs
-│   │   │           └── sell.rs
-│   │   └── tests/               # Integration tests
-│   │       └── pump_fun.rs
-│   ├── metaplex-cpis/           # Metaplex integrations
-│   └── oracle-cpis/             # Oracle integrations
-├── pinocchio-helper/            # Shared utilities
-└── Cargo.toml                   # Workspace config
+│   └── dexs/                    # DEX CPI implementations
+│       ├── src/
+│       │   ├── instruction/
+│       │   │   ├── pump_fun/    # Pump.fun CPIs
+│       │   │   │   ├── buy_exact_sol_in.rs
+│       │   │   │   └── sell.rs
+│       │   │   └── raydium_cpmm/# Raydium CPMM CPIs (New)
+│       │   │       ├── swap_base_input.rs
+│       │   │       └── swap_base_output.rs
+│       │   └── entrypoint.rs
+├── clients/                     # Generated clients (Simulated)
+│   └── dexs/
+│       ├── js/                  # TypeScript client
+│       └── rust/                # Rust client
+├── tests/                       # TypeScript Integration Tests
+│   └── dexs/
+│       ├── buy_exact_sol_in.ts
+│       ├── sell.ts
+│       ├── raydium_cpmm_swap_base_input.ts
+│       ├── raydium_cpmm_swap_base_output.ts
+│       ├── pump_fun_utils.ts
+│       └── raydium_cpmm_utils.ts
+└── idls/                        # Generated IDLs (Shank)
 ```
 
 ---
@@ -85,49 +76,64 @@ pinocchio-cpi-examples/
 
 ### Prerequisites
 
-<!-- - Rust 1.79+ -->
+- Solana CLI 1.18+
+- Bun (for running TypeScript tests) (or Node.js + ts-node)
+- Surfpool or Local Validator
 
-- Solana CLI 3.1.5
-- Surfpool (Local validator for testing)
-
-### Build
+### Build Programs
 
 ```bash
 # Clone the repository
 git clone https://github.com/lainhathoang/pinocchio-cpi-examples.git
 cd pinocchio-cpi-examples
 
-# Build all programs
+# Build all programs using SBF (Solana BPF)
+# This command ensures dependencies are built correctly
 cargo build-sbf
-
-# Run tests
-# cargo test -p dexs --test pump_fun -- --nocapture
 ```
 
-### Run Integration Tests (Localnet)
+### Run Integration Tests
 
-```bash
-# Start local validator with cloned Pump.fun program
-surfpool start
-```
+Tests are written in TypeScript and run against a local validator (localnet).
 
----
+1. **Start Local Validator**
 
-## 🧪 Testing
+### Run Integration Tests
 
-Each CPI implementation includes comprehensive tests:
+Tests are written in TypeScript and run against a local validator (localnet).
 
-- **Unit Tests**: Verify instruction serialization and PDA derivation
-- **Integration Tests**: Execute real transactions on localnet
-- **Token-2022 Support**: Full compatibility with the new token standard
+1. **Start Local Validator**
 
-```bash
-# Run all tests
-cargo test --workspace
+   Use `surfpool` to start a local validator with cloned accounts from mainnet.
 
-# Run specific test with output
-cargo test -p dexs test_pda_derivation -- --nocapture
-```
+   ```bash
+   surfpool start
+   ```
+
+2. **Deploy Program**
+
+   Deploy the built program to localnet to the specific Program ID used in tests (`soGjzMzHhQ4pCR8bydyU7DHMJ4AxddLxsGbhUotGMP7`).
+
+   ```bash
+   solana program deploy target/sbf/deploy/dexs.so --program-id soGjzMzHhQ4pCR8bydyU7DHMJ4AxddLxsGbhUotGMP7 --use-rpc
+   ```
+
+3. **Run Tests with Bun**
+
+   We use `bun` for fast execution of TypeScript tests.
+
+   ```bash
+   # Install dependencies
+   pnpm install
+
+   # Run Pump.fun tests
+   bun tests/dexs/buy_exact_sol_in.ts
+   bun tests/dexs/sell.ts
+
+   # Run Raydium CPMM tests
+   bun tests/dexs/raydium_cpmm_swap_base_input.ts
+   bun tests/dexs/raydium_cpmm_swap_base_output.ts
+   ```
 
 ---
 
@@ -147,12 +153,6 @@ Contributions are welcome! Here's how you can help:
 - [Pinocchio Documentation](https://docs.rs/pinocchio)
 - [Pinocchio GitHub](https://github.com/anza-xyz/pinocchio)
 - [Solana CPI Guide](https://solana.com/docs/core/cpi)
-
----
-
-<!-- ## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->
 
 ---
 

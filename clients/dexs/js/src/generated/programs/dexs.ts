@@ -12,7 +12,8 @@ import type {
 	ParsedPumpFunBuyInstruction,
 	ParsedPumpFunSellInstruction,
 	ParsedRaydiumCpmmInitInstruction,
-	ParsedRaydiumCpmmSwapBaseInInstruction
+	ParsedRaydiumCpmmSwapBaseInInstruction,
+	ParsedRaydiumCpmmSwapBaseOutInstruction
 } from "../instructions"
 
 export const DEXS_PROGRAM_ADDRESS =
@@ -23,7 +24,8 @@ export enum DexsInstruction {
 	PumpFunBuyExactSolIn,
 	PumpFunSell,
 	RaydiumCpmmInit,
-	RaydiumCpmmSwapBaseIn
+	RaydiumCpmmSwapBaseIn,
+	RaydiumCpmmSwapBaseOut
 }
 
 export function identifyDexsInstruction(
@@ -44,6 +46,9 @@ export function identifyDexsInstruction(
 	}
 	if (containsBytes(data, getU8Encoder().encode(4), 0)) {
 		return DexsInstruction.RaydiumCpmmSwapBaseIn
+	}
+	if (containsBytes(data, getU8Encoder().encode(5), 0)) {
+		return DexsInstruction.RaydiumCpmmSwapBaseOut
 	}
 	throw new Error("The provided instruction could not be identified as a dexs instruction.")
 }
@@ -66,3 +71,6 @@ export type ParsedDexsInstruction<
 	| ({
 			instructionType: DexsInstruction.RaydiumCpmmSwapBaseIn
 	  } & ParsedRaydiumCpmmSwapBaseInInstruction<TProgram>)
+	| ({
+			instructionType: DexsInstruction.RaydiumCpmmSwapBaseOut
+	  } & ParsedRaydiumCpmmSwapBaseOutInstruction<TProgram>)

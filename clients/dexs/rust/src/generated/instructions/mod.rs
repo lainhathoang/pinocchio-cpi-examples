@@ -10,9 +10,11 @@ pub(crate) mod r#pump_fun_buy_exact_sol_in;
 pub(crate) mod r#pump_fun_sell;
 pub(crate) mod r#raydium_cpmm_init;
 pub(crate) mod r#raydium_cpmm_swap_base_in;
+pub(crate) mod r#raydium_cpmm_swap_base_out;
 
 pub use self::r#pump_fun_buy::*;
 pub use self::r#pump_fun_buy_exact_sol_in::*;
 pub use self::r#pump_fun_sell::*;
 pub use self::r#raydium_cpmm_init::*;
 pub use self::r#raydium_cpmm_swap_base_in::*;
+pub use self::r#raydium_cpmm_swap_base_out::*;

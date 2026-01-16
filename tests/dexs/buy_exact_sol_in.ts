@@ -11,11 +11,12 @@
  */
 
 import {
-	appendTransactionMessageInstruction,
+	appendTransactionMessageInstructions,
 	createSolanaRpc,
 	createSolanaRpcSubscriptions,
 	createTransactionMessage,
 	getSignatureFromTransaction,
+	type Instruction,
 	isSolanaError,
 	pipe,
 	sendAndConfirmTransactionFactory,
@@ -58,28 +59,13 @@ async function testBuyExactSolIn() {
 	const rpcSubscriptions = createSolanaRpcSubscriptions(WSS_URL)
 
 	// Load keypair
-	let signer: Awaited<ReturnType<typeof loadKeypair>>
-	try {
-		signer = await loadKeypair()
-	} catch (e) {
-		console.error("Failed to load keypair:", e)
-		console.log("Ensure ~/.config/solana/id.json exists")
-		return
-	}
-
+	const signer = await loadKeypair()
 	const userAddress = signer.address
 	console.log("User:", userAddress)
 
 	// Check balance
-	let balance: bigint
-	try {
-		const balanceResult = await rpc.getBalance(userAddress).send()
-		balance = balanceResult.value
-	} catch (e) {
-		console.error("Failed to get balance:", e)
-		console.log("Make sure localnet is running: solana-test-validator")
-		return
-	}
+	const balanceResult = await rpc.getBalance(userAddress).send()
+	const balance = balanceResult.value
 
 	console.log(`User SOL balance: ${Number(balance) / Number(LAMPORTS_PER_SOL)} SOL`)
 
@@ -156,8 +142,9 @@ async function testBuyExactSolIn() {
 	const patchedData = new Uint8Array(generatedInstruction.data)
 	patchedData[0] = PUMP_FUN_BUY_EXACT_SOL_IN_DISCRIMINATOR
 
-	const buyInstruction = {
-		...generatedInstruction,
+	const buyInstruction: Instruction = {
+		programAddress: generatedInstruction.programAddress,
+		accounts: generatedInstruction.accounts,
 		data: patchedData
 	}
 
@@ -166,39 +153,38 @@ async function testBuyExactSolIn() {
 	console.log(`Min tokens out: ${minTokensOut}`)
 	console.log(`Discriminator: ${patchedData[0]} (PumpFunBuyExactSolIn)`)
 
+	// Build instructions array
+	const instructions: Instruction[] = []
+
+	if (needsCreateAta) {
+		console.log("Adding Create ATA instruction...")
+		const createAtaIx: Instruction = {
+			programAddress: ASSOCIATED_TOKEN_PROGRAM,
+			accounts: [
+				{ address: userAddress, role: 3 },
+				{ address: accounts.associatedUser, role: 1 },
+				{ address: userAddress, role: 0 },
+				{ address: TEST_MINT, role: 0 },
+				{ address: SYSTEM_PROGRAM, role: 0 },
+				{ address: tokenProgram, role: 0 }
+			],
+			data: new Uint8Array([])
+		}
+		instructions.push(createAtaIx)
+	}
+
+	instructions.push(buyInstruction)
+
 	// Get recent blockhash
 	const { value: latestBlockhash } = await rpc.getLatestBlockhash().send()
 
-	// Build transaction - start with the base message
-	const baseMessage = pipe(
+	// Build transaction message
+	const transactionMessage = pipe(
 		createTransactionMessage({ version: 0 }),
 		tx => setTransactionMessageFeePayerSigner(signer, tx),
-		tx => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx)
+		tx => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
+		tx => appendTransactionMessageInstructions(instructions, tx)
 	)
-
-	// Build the final transaction message with all instructions
-	const transactionMessage = needsCreateAta
-		? pipe(
-				baseMessage,
-				tx => {
-					console.log("Adding Create ATA instruction...")
-					const createAtaIx = {
-						programAddress: ASSOCIATED_TOKEN_PROGRAM,
-						accounts: [
-							{ address: userAddress, role: 3 as const },
-							{ address: accounts.associatedUser, role: 1 as const },
-							{ address: userAddress, role: 0 as const },
-							{ address: TEST_MINT, role: 0 as const },
-							{ address: SYSTEM_PROGRAM, role: 0 as const },
-							{ address: tokenProgram, role: 0 as const }
-						],
-						data: new Uint8Array([])
-					}
-					return appendTransactionMessageInstruction(createAtaIx, tx)
-				},
-				tx => appendTransactionMessageInstruction(buyInstruction, tx)
-			)
-		: appendTransactionMessageInstruction(buyInstruction, baseMessage)
 
 	// Sign transaction
 	const signedTransaction = await signTransactionMessageWithSigners(transactionMessage)
@@ -212,10 +198,9 @@ async function testBuyExactSolIn() {
 			rpcSubscriptions
 		})
 
-		// @ts-expect-error - Type compatibility issue with @solana/kit transaction types
-		await sendAndConfirmTransaction(signedTransaction, {
-			commitment: "confirmed"
-		})
+		await (
+			sendAndConfirmTransaction as (tx: unknown, opts: { commitment: string }) => Promise<void>
+		)(signedTransaction, { commitment: "confirmed" })
 
 		const signature = getSignatureFromTransaction(signedTransaction)
 		console.log("\n✅ Transaction successful!")

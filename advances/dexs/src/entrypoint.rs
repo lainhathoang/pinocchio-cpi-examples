@@ -1,7 +1,10 @@
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 use pinocchio_log::log;
 
-use crate::instruction::{ProgramInstruction, PumpFunBuyExactSolInContext, PumpFunSellContext};
+use crate::instruction::{
+    ProgramInstruction, PumpFunBuyExactSolInContext, PumpFunSellContext,
+    RaydiumCpmmSwapBaseInputContext, RaydiumCpmmSwapBaseOutputContext,
+};
 
 pub fn process_instruction(
     _program_id: &Address,
@@ -35,8 +38,11 @@ pub fn process_instruction(
         }
         ProgramInstruction::RaydiumCpmmSwapBaseIn => {
             log!("Instruction: RaydiumCpmmSwapBaseIn");
-            Ok(())
+            RaydiumCpmmSwapBaseInputContext::try_from((accounts, data))?.handler()
         }
-        _ => todo!(),
+        ProgramInstruction::RaydiumCpmmSwapBaseOut => {
+            log!("Instruction: RaydiumCpmmSwapBaseOut");
+            RaydiumCpmmSwapBaseOutputContext::try_from((accounts, data))?.handler()
+        }
     }
 }

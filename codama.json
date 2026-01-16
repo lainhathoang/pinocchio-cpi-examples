@@ -1,5 +1,5 @@
 {
-	"idl": "./idl/dexs.json",
+	"idl": "./idls/dexs.json",
 	"before": [],
 	"scripts": {
 		"js": {
